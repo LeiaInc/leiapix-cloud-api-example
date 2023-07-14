@@ -99,7 +99,7 @@ try:
     # disparity map, and the result url where disparity map will be uploaded.
     # You can find all available parameters in the documentation on
     # https://cloud.leiapix.com
-    requests.post(
+    r = requests.post(
         f'{MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/disparity',
         headers={
             'Authorization': f'Bearer {access_token}'
@@ -111,6 +111,9 @@ try:
         },
         timeout=THREE_MIN_IN_S
     )
+    if not r.status_code==200:
+        print(f"Request returned with an error {r.status_code}")
+        exit(1)
 
     # At this point, the disparity map should be uploaded to the upload
     # url. We omit the error handling in this example for simplicity, but
@@ -165,6 +168,9 @@ try:
         },
         timeout=THREE_MIN_IN_S
     )
+    if not r.status_code==200:
+        print(f"Request returned with an error {r.status_code}")
+        exit(1)
 
     # At this point, the video should be uploaded to a specified upload URL.
 

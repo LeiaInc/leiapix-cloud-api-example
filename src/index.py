@@ -111,9 +111,8 @@ try:
         },
         timeout=THREE_MIN_IN_S
     )
-    if not r.status_code==200:
-        print(f"Request returned with an error {r.status_code}")
-        exit(1)
+    if not r.status_code == 200:
+        raise Exception(f"Request returned with an error {r.status_code}")
 
     # At this point, the disparity map should be uploaded to the upload
     # url. We omit the error handling in this example for simplicity, but
@@ -168,9 +167,8 @@ try:
         },
         timeout=THREE_MIN_IN_S
     )
-    if not r.status_code==200:
-        print(f"Request returned with an error {r.status_code}")
-        exit(1)
+    if not r.status_code == 200:
+        raise Exception(f"Request returned with an error {r.status_code}")
 
     # At this point, the video should be uploaded to a specified upload URL.
 

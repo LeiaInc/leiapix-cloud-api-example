@@ -1,0 +1,27 @@
+{
+  "name": "restapidemo",
+  "version": "1.0.0",
+  "description": "Demo App",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "start:nodejs": "npm run build && source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION node dist/index.js",
+    "start:python": "source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION python3 src/index.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.1.7",
+    "@types/uuid": "^9.0.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.332.0",
+    "@aws-sdk/credential-provider-node": "^3.332.0",
+    "@aws-sdk/s3-request-presigner": "^3.332.0",
+    "axios": "^1.4.0",
+    "uuid": "^9.0.0"
+  }
+}

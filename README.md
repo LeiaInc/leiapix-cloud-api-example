@@ -3,7 +3,7 @@
 This repo contains examples of backend integration with Media Cloud REST API.
 
 The examples are provided for two use cases:
-* using LeiaPix temporary storage API. Please refer to [NodeJS](src/using-leiapix-storage-api.ts) and [Python3](src/using-leiapix-storage-api.py) files to see the code integration examples for each corresponding language.
+* using LeiaPix temporary storage API. Please refer to [NodeJS](src/using-leiapix-storage.ts) and [Python3](src/using-leiapix-storage.py) files to see the code integration examples for each corresponding language.
 * using your own S3 storage. Please refer to [NodeJS](src/using-custom-storage.ts) and [Python3](src/using-custom-storage.py) files to see the code integration examples for each corresponding language.
 
 # Using LeiaPix temporary storage
@@ -32,7 +32,7 @@ Before running the `npm run start:python-provided`, you would want to configure 
 4. Run `pip install -r requirements.txt` from the root directory. This will install all the project dependencies in the currently active virtual env.
 
 #### Running python3 example
-After the configuration of virtual env is completed, you may run the python example script with `npm run start:python-provided`. Running this command instead of running a file directly with `python3 src/using-leiapix-storage-api.py` will read env values from `.env` and make them available as ENV vars during script execution.
+After the configuration of virtual env is completed, you may run the python example script with `npm run start:python-provided`. Running this command instead of running a file directly with `python3 src/using-leiapix-storage.py` will read env values from `.env` and make them available as ENV vars during script execution.
 
 # Using your own custom s3 storage
 

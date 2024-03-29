@@ -64,34 +64,18 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
     // ID which you use in your system for this image/entity represented
     // by the image/etc, or, as we do now, we can just generate new UUIDv4.
     let correlationId = uuidv4();
+    console.log(`\nGenerating Disparity with correlationId: ${correlationId}...`);
 
     // Before you'll to be able to create an animation, you want to generate a
-    // disparity map for your image and store it somewhere. For the next step,
-    // you'll need to provide an uploadable URL where Leia Media Cloud API
-    // will PUT the result of the call. Here we use the Leia Storage API to
-    // generate the upload URL for the temporary storage of the result.
-    let fileName = "disparity.jpg";
-    let mediaType = "image/jpeg";
-    let disparityUploadUrlResult = await axios.get(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/get-upload-url?correlationId=${correlationId}&fileName=${fileName}&mediaType=${mediaType}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      },
-      timeout: THREE_MIN_IN_MS,
-    });
+    // disparity map for your image and store it somewhere.
 
-    const putDisparityPresignedUrl = disparityUploadUrlResult.data.url;
-
-    console.log(`\nGenerating Disparity: ${correlationId}...`);
-
-    // Now we're ready to call the API. We provide only required parameters: a
-    // correlationId, URL of the image for which we want to generate
-    // disparity map, and the result url where disparity map will be
-    // uploaded. You can find all available parameters in the documentation
+    // Here we will provide only required parameters: a correlationId and the
+    // URL of the image for which we want to generate the disparity map.
+    // You can find all available parameters in the documentation
     // on https://cloud.leiapix.com
     let disparityGenerationResult = await axios.post(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/disparity`, {
       correlationId,
-      inputImageUrl: ORIGINAL_IMAGE_URL,
-      resultPresignedUrl: putDisparityPresignedUrl
+      inputImageUrl: ORIGINAL_IMAGE_URL
     }, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -99,13 +83,12 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
       timeout: THREE_MIN_IN_MS,
     });
 
-    // At this point, the disparity map should be uploaded to the upload
-    // url. We omit the error handling in this example for simplicity, but
+    // We omit the error handling in this example for simplicity, but
     // you should always check for a returned status & errors from the API
     // in real code.
 
-    // The result of the call contains a GET pre-signed URL to download the
-    // resulting disparity image:
+    // The result of the call contains a short-lived  GET pre-signed URL
+    // to download the resulting disparity image:
 
     const getDisparityPresignedUrl = disparityGenerationResult.data.resultPresignedUrl;
 
@@ -117,33 +100,22 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
     // the service. The steps are very similar to how we called a disparity
     // map endpoint: first we acquire correlationId...
     correlationId = uuidv4();
+    console.log(`\nGenerating mp4 animation with correlationId: ${correlationId}...`);
 
-    // ...then we prepare an uploadable url...
-    fileName = "animation.mp4";
-    mediaType = "video/mp4";
-    let animationUploadUrlResult = await axios.get(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/get-upload-url?correlationId=${correlationId}&fileName=${fileName}&mediaType=${mediaType}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      },
-      timeout: THREE_MIN_IN_MS,
-    });
-    const putMP4PresignedUrl = animationUploadUrlResult.data.url;
-
-    console.log(`\nGenerating mp4 animation: ${correlationId}...`);
-
-    // ...and we make a request. This time we need four required inputs: a
+    // Then we make a request. This time we need two required inputs: a
     // correlationId; original image we want to animate (which was used for
-    // disparity map generation); the pre-signed PUT URL for a disparity map
-    // from previous step (this URL needs to support HTTP PUT verb, so use the
-    // one that was used to upload the disparity result); and an uploadable url
-    // for the result animation. You can find all available parameters in the
+    // disparity map generation); and an uploadable url for the result animation.
+    // OPTIONALLY, you can provide the URL of the disparity map obtained from
+    // the previous step. Otherwise, a new disparity map will be generated
+    // automatically.
+    // You can find all available parameters in the
     // documentation on https://cloud.leiapix.com
     let animationGenerationResult = await axios.post(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/animation`, {
       correlationId,
       inputImageUrl: ORIGINAL_IMAGE_URL,
-      inputDisparityUrl: putDisparityPresignedUrl,
-      resultPresignedUrl: putMP4PresignedUrl,
-      animationLength: 5
+      animationLength: 5,
+      //OPTIONALLY:
+      inputDisparityUrl: getDisparityPresignedUrl
     }, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -151,7 +123,6 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
       timeout: THREE_MIN_IN_MS,
     });
 
-    // At this point, the video should be uploaded to a specified upload URL.
     // The resulting file is accessible via the pre-signed GET URL, that you
     // can find included in the response to the animation request:
     const getMP4PresignedUrl = animationGenerationResult.data.resultPresignedUrl;

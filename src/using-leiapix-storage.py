@@ -63,33 +63,15 @@ try:
     # ID which you use in your system for this image/entity represented
     # by the image/etc, or, as we do now, we can just generate new UUIDv4.
     correlation_id = str(uuid.uuid4())
+    print(f'\nGenerating Disparity with correlationId: {correlation_id}...')
 
     # Before you'll to be able to create an animation, you want to generate a
-    # disparity map for your image and store it somewhere. For the next step,
-    # you'll need to provide an uploadable URL where Leia Media Cloud API
-    # will PUT the result of the call. Here we use the Leia Storage API to
-    # generate the upload URL for the temporary storage of the result.
-    fileName = 'disparity.jpg'
-    mediaType = 'image/jpeg'
-    response = requests.get(
-        f'{MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/get-upload-url?correlationId={correlation_id}&fileName={fileName}&mediaType={mediaType}',
-        headers={
-            'Authorization': f'Bearer {access_token}'
-        },
-        timeout=THREE_MIN_IN_S)
-    if not response.status_code == 200:
-        raise Exception(f"Request returned with an error {response.status_code}. "
-                        f"The full response is: {response.content}")
-    put_disparity_presigned_url = response.json()['url']
+    # disparity map for your image and store it somewhere.
 
-
-    print(f'\nGenerating Disparity: {correlation_id}...')
-
-    # Now we're ready to call the API. We provide only required parameters: a
-    # correlationId, URL of the image for which we want to generate
-    # disparity map, and the result url where disparity map will be uploaded.
-    # You can find all available parameters in the documentation on
-    # https://cloud.leiapix.com
+    # Here we will provide only required parameters: a correlationId and the
+    # URL of the image for which we want to generate the disparity map.
+    # You can find all available parameters in the documentation
+    # on https://cloud.leiapix.com
     response = requests.post(
         f'{MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/disparity',
         headers={
@@ -97,8 +79,7 @@ try:
         },
         json={
             'correlationId': correlation_id,
-            'inputImageUrl': ORIGINAL_IMAGE_URL,
-            'resultPresignedUrl': put_disparity_presigned_url
+            'inputImageUrl': ORIGINAL_IMAGE_URL
         },
         timeout=THREE_MIN_IN_S
     )
@@ -106,13 +87,12 @@ try:
         raise Exception(f"Request returned with an error {response.status_code}. "
                         f"The full response is: {response.content}")
 
-    # At this point, the disparity map should be uploaded to the upload
-    # url. We omit the error handling in this example for simplicity, but
+    # We omit the error handling in this example for simplicity, but
     # you should always check for a returned status & errors from the API
     # in real code.
 
-    # The result of the call contains a GET pre-signed URL to download the
-    # resulting disparity image:
+    # The result of the call contains a short-lived  GET pre-signed URL
+    # to download the resulting disparity image:
     get_disparity_presigned_url = response.json()['resultPresignedUrl']
 
     print(f'\nDisparity has been uploaded to the temporary storage. '
@@ -123,29 +103,15 @@ try:
     # the service. The steps are very similar to how we called a disparity
     # map endpoint: first we acquire correlationId...
     correlation_id = str(uuid.uuid4())
+    print(f'\nGenerating mp4 animation with correlationId: {correlation_id}...')
 
-    # ...then we prepare an uploadable url...
-    fileName = 'animation.mp4'
-    mediaType = 'video/mp4'
-    response = requests.get(
-        f'{MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/get-upload-url?correlationId={correlation_id}&fileName={fileName}&mediaType={mediaType}',
-        headers={
-            'Authorization': f'Bearer {access_token}'
-        },
-        timeout=THREE_MIN_IN_S)
-    if not response.status_code == 200:
-        raise Exception(f"Request returned with an error {response.status_code}. "
-                        f"The full response is: {response.content}")
-    put_mp4_presigned_url = response.json()['url']
-
-    print(f'\nGenerating mp4 animation: {correlation_id}...')
-
-    # ...and we make a request. This time we need four required inputs: a
+    # Then we make a request. This time we need two required inputs: a
     # correlationId; original image we want to animate (which was used for
-    # disparity map generation); the pre-signed PUT URL for a disparity map
-    # from previous step (this URL needs to support HTTP GET verb, so use the
-    # one that was used to upload the disparity result); and an uploadable url
-    # for the result animation. You can find all available parameters in the
+    # disparity map generation); and an uploadable url for the result animation.
+    # OPTIONALLY, you can provide the URL of the disparity map obtained from
+    # the previous step. Otherwise, a new disparity map will be generated
+    # automatically.
+    # You can find all available parameters in the
     # documentation on https://cloud.leiapix.com
     response = requests.post(
         f'{MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/animation',
@@ -155,9 +121,9 @@ try:
         json={
             'correlationId': correlation_id,
             'inputImageUrl': ORIGINAL_IMAGE_URL,
-            'inputDisparityUrl': put_disparity_presigned_url,
-            'resultPresignedUrl': put_mp4_presigned_url,
-            'animationLength': 5
+            'animationLength': 5,
+            # OPTIONALLY
+            'resultPresignedUrl': get_disparity_presigned_url,
         },
         timeout=THREE_MIN_IN_S
     )
@@ -165,7 +131,6 @@ try:
         raise Exception(f"Request returned with an error {response.status_code}. "
                         f"The full response is: {response.content}")
 
-    # At this point, the video should be uploaded to a specified upload URL.
     # The resulting file is accessible via the pre-signed GET URL, that you
     # can find included in the response to the animation request:
     get_mp4_presigned_url = response.json()['resultPresignedUrl']

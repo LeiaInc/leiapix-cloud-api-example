@@ -1,8 +1,6 @@
 import sys
 import os
 import uuid
-import boto3
-from botocore.exceptions import NoCredentialsError
 import requests
 
 # print("\n".join(sys.path))
@@ -59,9 +57,10 @@ try:
     * generate a disparity map for our image.
     """
 
-    # We start with preparing a correlationId. This might be an internal
-    # ID which you use in your system for this image/entity represented
+    # OPTIONAL. We start with preparing a correlationId. This might be an
+    # internal ID which you use in your system for the entity represented
     # by the image/etc, or, as we do now, we can just generate new UUIDv4.
+    # If not provided, we will generate one for you automatically.
     correlation_id = str(uuid.uuid4())
     print(f'\nGenerating Disparity with correlationId: {correlation_id}...')
 
@@ -78,8 +77,9 @@ try:
             'Authorization': f'Bearer {access_token}'
         },
         json={
+            'inputImageUrl': ORIGINAL_IMAGE_URL,
+            # OPTIONALLY:
             'correlationId': correlation_id,
-            'inputImageUrl': ORIGINAL_IMAGE_URL
         },
         timeout=THREE_MIN_IN_S
     )
@@ -101,12 +101,12 @@ try:
     # If you're interested not only in a disparity map, but you also want
     # to generate an animation, you would need to make another request to
     # the service. The steps are very similar to how we called a disparity
-    # map endpoint: first we acquire correlationId...
+    # map endpoint: first we (OPTIONALLY) acquire correlationId...
     correlation_id = str(uuid.uuid4())
     print(f'\nGenerating mp4 animation with correlationId: {correlation_id}...')
 
-    # Then we make a request. This time we need two required inputs: a
-    # correlationId; original image we want to animate (which was used for
+    # Then we make a request. This time we need two required inputs:
+    # original image we want to animate (which was used for
     # disparity map generation); and an uploadable url for the result animation.
     # OPTIONALLY, you can provide the URL of the disparity map obtained from
     # the previous step. Otherwise, a new disparity map will be generated
@@ -119,10 +119,10 @@ try:
             'Authorization': f'Bearer {access_token}'
         },
         json={
-            'correlationId': correlation_id,
             'inputImageUrl': ORIGINAL_IMAGE_URL,
             'animationLength': 5,
-            # OPTIONALLY
+            # OPTIONALLY:
+            'correlationId': correlation_id,
             'resultPresignedUrl': get_disparity_presigned_url,
         },
         timeout=THREE_MIN_IN_S

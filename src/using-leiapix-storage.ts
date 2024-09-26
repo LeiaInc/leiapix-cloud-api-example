@@ -60,9 +60,10 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
      * generate a disparity map for our image.
      */
 
-    // We start with preparing a correlationId. This might be an internal
-    // ID which you use in your system for this image/entity represented
+    // OPTIONAL. We start with preparing a correlationId. This might be an
+    // internal ID which you use in your system for the entity represented
     // by the image/etc, or, as we do now, we can just generate new UUIDv4.
+    // If not provided, we will generate one for you automatically.
     let correlationId = uuidv4();
     console.log(`\nGenerating Disparity with correlationId: ${correlationId}...`);
 
@@ -74,7 +75,7 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
     // You can find all available parameters in the documentation
     // on https://cloud.leiapix.com
     let disparityGenerationResult = await axios.post(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/disparity`, {
-      correlationId,
+      correlationId, //OPTIONAL
       inputImageUrl: ORIGINAL_IMAGE_URL
     }, {
       headers: {
@@ -98,12 +99,12 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
     // If you're interested not only in a disparity map, but you also want
     // to generate an animation, you would need to make another request to
     // the service. The steps are very similar to how we called a disparity
-    // map endpoint: first we acquire correlationId...
+    // map endpoint: first we (OPTIONALLY) acquire correlationId...
     correlationId = uuidv4();
     console.log(`\nGenerating mp4 animation with correlationId: ${correlationId}...`);
 
-    // Then we make a request. This time we need two required inputs: a
-    // correlationId; original image we want to animate (which was used for
+    // Then we make a request. This time we need two required inputs:
+    // original image we want to animate (which was used for
     // disparity map generation); and an uploadable url for the result animation.
     // OPTIONALLY, you can provide the URL of the disparity map obtained from
     // the previous step. Otherwise, a new disparity map will be generated
@@ -111,10 +112,10 @@ const THREE_MIN_IN_MS = 3 * 60 * 1000;
     // You can find all available parameters in the
     // documentation on https://cloud.leiapix.com
     let animationGenerationResult = await axios.post(`${MEDIA_CLOUD_REST_API_BASE_URL}/api/v1/animation`, {
-      correlationId,
       inputImageUrl: ORIGINAL_IMAGE_URL,
       animationLength: 5,
       //OPTIONALLY:
+      correlationId,
       inputDisparityUrl: getDisparityPresignedUrl
     }, {
       headers: {

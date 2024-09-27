@@ -1,13 +1,15 @@
 {
   "name": "restapidemo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Demo App",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/index.js",
-    "start:nodejs": "npm run build && source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION node dist/index.js",
-    "start:python": "source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION python3 src/index.py",
+    "start:nodejs-provided": "npm run build && source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET node dist/using-leiapix-storage.js",
+    "start:python-provided": "source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET python3 src/using-leiapix-storage.py",
+    "start:nodejs-custom": "npm run build && source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION node dist/using-custom-storage.js",
+    "start:python-custom": "source .env && ORIGINAL_IMAGE_URL=$ORIGINAL_IMAGE_URL BACKEND_CLIENT_ID=$BACKEND_CLIENT_ID BACKEND_CLIENT_SECRET=$BACKEND_CLIENT_SECRET S3_BUCKET_NAME=$S3_BUCKET_NAME S3_BUCKET_REGION=$S3_BUCKET_REGION python3 src/using-custom-storage.py",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
